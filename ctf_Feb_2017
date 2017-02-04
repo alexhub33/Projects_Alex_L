@@ -1,0 +1,32 @@
+  1 import sys
+  2 import urllib2
+  3 
+  4 #https://www.youtube.com/watch?v=c92Cnb9_RSc
+  5 #pre-provided functions
+  6 #e.g. how to I open a website with python
+  7 #library called url lib2
+  8 #https://docs.python.org/2/library/urllib2.html
+  9 #This example gets the python.org main page and displays the first 100 bytes of it:
+ 10 #:set number
+ 11 #set nonumber
+ 12 #about_page, when typing it out....it has to be right up to the left edge, no spaces
+ 13 #LINUX: ctrl z to background, fg to bring back to foreground...but what happens if you use multiple pr    ograms?
+ 14 
+ 15 
+ 16 # about_page = urllib2.urlopen("http://ctf.slothparadise.com/about.php").read()
+ 17 # print (about_page)
+ 18 #while True - Will run infinitely..........but program stops because we added exit program code, sys.e
+    xit(0)
+ 19 
+ 20 
+ 21 
+ 22 while True:
+ 23         about_page = urllib2.urlopen("http://ctf.slothparadise.com/about.php").read()
+ 24         if "KEY" in about_page:
+ 25             print(about_page)
+ 26             sys.ext(0)
+ 27 
+ 28 #searching if key is in the about page
+ 29 #python is always about libaries
+ 30 # sys.ext(0) , exits python script
+~                                             
