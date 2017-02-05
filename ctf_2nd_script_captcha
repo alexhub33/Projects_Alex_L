@@ -1,4 +1,7 @@
-       import sys 
+#c92Cnb9_RSc
+
+
+import sys 
 import urllib2
 
 walled_garden = urllib2.urlopen("http://ctf.slothparadise.com/walled_garden.php?name=alex").rd()
