@@ -1,7 +1,7 @@
 import sys
 import urllib2
 
-#https://www.youtube.com/watch?v=c92Cnb9_RSc
+#c92Cnb9_RSc
 #pre-provided functions
 #e.g. how to I open a website with python
 #library called url lib2
