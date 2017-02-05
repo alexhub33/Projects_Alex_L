@@ -1,0 +1,40 @@
+       import sys 
+import urllib2
+
+walled_garden = urllib2.urlopen("http://ctf.slothparadise.com/walled_garden.php?name=alex").rd()
+
+while True:
+        first_split = walled_garden.split ("<pre>")
+        second_split = first_split[1].split("</pre>")
+
+#1st element of an array = the capta. 1st element of an array is 0.  
+
+        walled_garden_with_captcha_custom_name = urllib2.urlopen("http://ctf.slothparadise.com/walled_garden.php?name=alex&captcha=" + second_split[0]).read()
+        print (walled_garden_with_captcha_custom_name)
+
+        if "KEY" in walled_garden:
+                print(walled_garden)
+                sys.exit(0)
+
+
+
+
+
+#<pre></pre> appears at the captcha
+#how do you grab a captcha from the site?  It's a huge string...
+#how do you split a stirng apart.  
+#https://www.tutorialspoint.com/python/string_split.htm
+
+
+
+
+
+
+
+#Split string examples:
+#!/usr/bin/python
+#str = "Line1-abcdef \nLine2-abc \nLine4-abcd";
+#print str.split( )
+#print str.split(' ', 1 )
+~                                                                                                         
+~                                               
