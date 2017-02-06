@@ -1,0 +1,311 @@
+#!/bin/bash
+
+# Globals =====================================================================
+
+choice=
+database="students.dat"
+# The separator used in the database
+separator=":"
+
+# Functions ===================================================================
+
+greeting()
+{
+   echo -e "\t*********************************************************"
+   echo -e "\t*                                                       *"
+   echo -e "\t*\tWelcome to the student database system!         *"
+   echo -e "\t*                                                       *"
+   echo -e "\t* Please enter one of the options below:                *"
+   echo -e "\t*                                                       *"
+   echo -e "\t* \t[a] to add a user to the database               *"
+   echo -e "\t* \t[e] to edit a user in the database              *"
+   echo -e "\t* \t[i] to get information about a particular user  *"
+   echo -e "\t* \t[r] to remove a user from the database          *"
+   echo -e "\t* \t[q] to quit                                     *"
+   echo -e "\t*                                                       *"
+   echo -e "\t*********************************************************"
+   echo
+
+   read -p "[?] Option: " choice
+}
+
+# -----------------------------------------------------------------------------
+#
+# Add a new user to the database
+#
+
+add_user()
+{
+   read_string "[-] Please, provide the username:" username
+   read_string "[-] Enter the student's name:" fullname
+   read_string "[-] Enter the student's program:" program
+   read_number "[-] Enter the student's GPA:" gpa
+   
+   email="${username}@gmail.com"
+   # Split the full name by spaces
+   name=($fullname)
+   firstname="${name[0]}"
+   lastname="${name[1]}"
+
+   # Keeping asking the user until he enters a non existing username
+   if username_exists "$username";
+   then
+      prompt_username "new_username"
+   fi
+
+   # Append the new record into the database
+   record="$username:$email:$firstname:$lastname:$program:$gpa"
+   echo "$record" >> "$database"
+   
+   echo "[+] The user '$username' has been added."
+}
+
+# -----------------------------------------------------------------------------
+#
+# Edit an existing user in the database
+#
+
+edit_user()
+{
+   local reply=
+   local temp=$(mktemp)
+
+   prompt_username "existing_username"
+
+   while [[ -z "$reply" ]];
+   do
+      read -p "[-] Which field do you want to edit, [p] program or [g] gpa: " reply
+      
+      if [[ "$reply" == "p" || "$reply" == "P" ]];
+      then
+         read_string "[-] Enter the name of the new program: " program
+         # The first column contains the username, hence $1 
+         # and the fifth column contains the program, hence $5
+         awk 'BEGIN{FS=OFS="'"$separator"'"} {if($1=="'"$username"'") $5="'"$program"'"; print;}' "$database" > "$temp"
+         mv "$temp" "$database"
+         echo "[+] The program of the user '$username' has been changed to '$program'."
+      elif [[ "$reply" == "g" || "$reply" == "G" ]];
+      then
+         read_number "[-] Enter the new GPA: " gpa
+         # The sixth column contains the GPA, hence $6
+         awk 'BEGIN{FS=OFS="'"$separator"'"} {if($1=="'"$username"'") $6="'"$gpa"'"; print;}' "$database" > "$temp"
+         mv "$temp" "$database"
+         echo "[+] The GPA of the user '$username' has been changed to '$gpa'."
+      else
+            reply=
+            echo "[!] Please enter a valid choice."
+      fi
+   done
+}
+
+# -----------------------------------------------------------------------------
+#
+# Remove user from database
+#
+
+remove_user()
+{
+   local reply=
+   local temp=$(mktemp)
+
+   prompt_username "existing_username"
+
+   while [[ -z "$reply" ]];
+   do
+      read -p "[-] Are you sure you want to delete the user '$username' from the database? (y/n) " reply
+      
+      if [[ "$reply" == "y" || "$reply" == "Y" ]];
+      then
+         # Save all the records except the one we don't want into a temporary file
+         awk -F"$separator" '$1 != "'"$username"'"' "$database" > "$temp"
+         # Move the temporary file to be our new database
+         mv "$temp" "$database"
+
+         # Or we can use 'sed' and replace in place the data
+         # Without the need for a temporary file
+         # sed --in-place "/^${username}${separator}/d" "$database"
+
+         echo "[+] The user '$username' has been deleted."
+      elif [[ "$reply" == "n" || "$reply" == "N" ]];
+      then
+         main
+      else
+         reply=
+         echo "[!] Please enter a valid option."
+      fi
+   done
+}
+
+# -----------------------------------------------------------------------------
+#
+# Display the information of the provided user
+#
+
+get_info()
+{
+   prompt_username "existing_username"
+
+   record=$(awk -F"$separator" '{if($1=="'"$username"'") print}' "$database")
+   # Split the retrieved line/record by the seperator, e.g: ':'
+   info=(${record//"$separator"/ })
+
+   echo
+   echo -e "\t- Username : ${info[0]}"
+   echo -e "\t- Email    : ${info[1]}"
+   echo -e "\t- Name     : ${info[2]} ${info[3]}"
+   echo -e "\t- Program  : ${info[4]}"
+   echo -e "\t- GPA      : ${info[5]}"
+   echo
+}
+
+# Helpers =====================================================================
+
+#
+# Prompt the user for input and checks if no input given 
+#
+
+read_string()
+{
+   local prompt_msg="$1"
+   local output_var="$2"
+
+   read -p "$prompt_msg" "$output_var"
+   while [[ -z "${!output_var}" ]];
+   do
+      echo "[!] Please check your input."
+      read -p "$prompt_msg" "$output_var"
+   done
+}
+
+# -----------------------------------------------------------------------------
+#
+# Prompt the user for input and check if it is a valid number, if not ask again
+#
+
+read_number()
+{
+   local prompt_msg="$1"
+   local output_var="$2"
+
+   read_string "$prompt_msg" "$output_var"
+   while ! [[ "${!output_var}" =~ ^[-+]?[0-9]+\.?[0-9]*$ ]];
+   do
+      echo "${!output_var}"
+      echo "[!] Please input a valid number."
+       read_string "$prompt_msg" "$output_var"
+   done
+}
+
+# -----------------------------------------------------------------------------
+#
+# Check if the provided username already exists in the database
+#
+
+username_exists()
+{
+   local username="$1"
+
+   # Extract the first column using 'awk'
+   # and check with 'grep' if the username exists
+   # full matching, hence the ^ that means starts with 
+   # and $ that means ends with
+   awk -F"$separator" '{print $1}' "$database" | grep --quiet "^$username$"
+
+   # Or we can do it in one line, where ':' is the separator
+   # We are looking for a line that starts with the username hence the '^'
+   # and we look for the seperator (e.g: ':') for full match
+   # grep "^${username}${separator}" "$database"
+}
+
+# -----------------------------------------------------------------------------
+#
+# Asks the user if he wants to try another username or go back to menu
+#
+
+prompt_try_username()
+{
+   local reply=
+
+   read -p "[-] Press [n] to try a new username, or [m] for the main menu: " reply
+      
+   if [[ "$reply" == "n" || "$reply" == "N" ]];
+   then
+      read -p "[-] Please, provide the username: " username
+   elif [[ "$reply" == "m" || "$reply" == "M" ]];
+   then
+      main
+   else
+      reply=
+      echo "[!] Please enter a valid choice."
+   fi
+}
+
+# -----------------------------------------------------------------------------
+#
+# Prompt the user for a username while making checks
+# This function has two checking modes
+# The first one "new_username" it checks the provided username exists
+# and if it does and it asks the user again to try another username
+# The second mode "existing_username" is the inverse of the first mode
+#
+
+prompt_username()
+{
+   local check_mode="$1"
+
+   read -p "[-] Please, provide the username: " username
+
+   if [[ "$check_mode" == "new_username" ]];
+   then
+      while username_exists "$username";
+      do
+         echo "[!] Please try another username."
+         prompt_try_username
+      done
+   elif [[ "$check_mode" == "existing_username" ]];
+   then
+      while ! username_exists "$username";
+      do
+         echo "[!] This user does not exist."
+         prompt_try_username
+      done
+   fi
+}
+# Entry-point =================================================================
+
+main()
+{
+   while true
+   do
+      clear
+      greeting
+
+      if [[ "$choice" == "a" || "$choice" == "A" ]];
+      then
+         add_user
+      elif [[ "$choice" == "e" || "$choice" == "E" ]];
+      then
+         edit_user
+      elif [[ "$choice" == "i" || "$choice" == "I" ]];
+      then
+         get_info
+      elif [[ "$choice" == "r" || "$choice" == "R" ]];
+      then
+         remove_user
+      elif [[ "$choice" == "q" || "$choice" == "Q" ]];
+      then
+         echo "[*] Goodbye!"
+         exit
+      else
+         echo "[!] Please enter a valid choice."
+      fi
+
+      read -n 1 -p "[-] Press any key to go back to the main menu"
+   done
+}
+
+# -----------------------------------------------------------------------------
+
+main "$@"
+
+# END =========================================================================
