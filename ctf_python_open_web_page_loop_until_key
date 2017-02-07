@@ -1,5 +1,6 @@
-import sys
-import urllib2
+#Alex L
+#This code will open a web page until it finds a KEY.  Key can be found in the inspect elements, hidden from plainview.
+
 
 #c92Cnb9_RSc
 #pre-provided functions
@@ -16,6 +17,12 @@ import urllib2
 # about_page = urllib2.urlopen("http://ctf.slothparadise.com/about.php").read()
 # print (about_page)
 #while True - Will run infinitely..........but program stops because we added exit program code, sys.exit(0)
+
+
+import sys
+import urllib2
+
+
 
 
 
