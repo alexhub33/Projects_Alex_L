@@ -1,5 +1,14 @@
-#Alex L
-#This script is a database system. Note the globals, use of functions, seperator used throughout the code
+
+# Script Name   : Bash_Database_Add_Edit_Get_Remove.py
+# Author        : Alex L
+# Created       : December 2016
+# Last Modified : January 2017
+# Version       : 2.0.0
+# Modifications : Added additional functions
+#               : 
+#
+# Description   : A database system. Note the globals, use of functions, seperator used throughout the code
+
 
 
 #!/bin/bash
