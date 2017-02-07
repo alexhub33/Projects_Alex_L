@@ -1,3 +1,7 @@
+#Alex L
+#This script is a database system. Note the globals, use of functions, seperator used throughout the code
+
+
 #!/bin/bash
 
 # Globals =====================================================================
