@@ -1,0 +1,61 @@
+
+--------Q1
+
+SELECT *
+FROM [Person].[PersonPhone]
+WHERE PhoneNumber LIKE '819%'
+OR PhoneNumber LIKE '899%'
+OR PhoneNumber LIKE '815%'
+ORDER BY PhoneNumber DESC;
+
+---------Q2
+
+SELECT BusinessEntityID, HireDate
+FROM [HumanResources].[Employee]
+WHERE HireDate <'2015-01-01'
+
+----------Q3
+
+SELECT * 
+FROM [Person].[Person]
+WHERE PersonType = 'EM'
+AND LastName LIKE 'H%';
+
+----------Q4
+
+SELECT * 
+FROM [HumanResources].[Department]
+WHERE GroupName = 'Manufacturing';
+
+-----------Q5
+
+SELECT * 
+FROM [HumanResources].[EmployeeDepartmentHistory]
+WHERE DepartmentID = '6';
+
+-----------Q6
+SELECT * 
+FROM [Production].[Product]
+WHERE ListPrice BETWEEN 10 AND 20;
+
+----------Q7
+
+SELECT StateProvinceID
+FROM [Sales].[SalesTaxRate]
+WHERE TaxRate <= 7.00;
+----------Q8
+
+SELECT * FROM HumanResources.Employee
+WHERE Gender = 'M'
+AND MaritalStatus = 'S';
+
+---------- Q9
+SELECT Name
+FROM Person.StateProvince
+WHERE CountryRegionCode = 'CA';
+
+---------- Q10
+SELECT Name
+FROM Person.StateProvince
+WHERE CountryRegionCode = 'US'
+AND Name LIKE 'A%';
