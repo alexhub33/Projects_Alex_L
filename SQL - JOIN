@@ -1,0 +1,97 @@
+Alex Leung
+JOIN SQL practice
+
+------Q1
+SELECT emp.first_name+emp.last_name AS 'Employee',
+man.first_name+man.last_name AS 'Manager'
+FROM employees emp
+JOIN
+employees man
+ON (man.employee_id=emp.manager_id);
+
+
+----Playing with the above, this is an EXAMPLE the letters previous are subjective and are just trackers
+SELECT b.first_name+b.last_name AS 'Employee',
+m.first_name+m.last_name AS 'Manager'
+FROM employees b
+JOIN
+employees m
+ON (m.employee_id=b.manager_id);
+
+------Q2
+SELECT dept.department_name, dept.manager_id, loc.city
+FROM departments dept 
+JOIN
+locations loc
+ON (dept.location_id=loc.location_id);
+
+
+--ON (dept.location_id=loc.location_id);  ---MISTAKE WAS NOT CHOOSING dept.location_id with loc.location_id,    location_id is the PK (Primary Key)
+
+SELECT *
+FROM departments
+
+SELECT *
+FROM locations
+
+------Q3
+
+SELECT c.country_name, loc.city
+FROM countries c
+JOIN
+locations loc
+ON (c.country_id=loc.country_id)
+
+-------------------------------------------MISTAKE WHEN FIRST WRITING CODE = FORGOT TO RENAME/tagup countries c ( FROM countries c )
+
+
+SELECT *
+FROM countries
+
+SELECT *
+FROM locations
+
+
+
+---------Q4
+----Tricky because it want's just the manager's first name and last names.  Not all the employees
+---explain why you matched manager ID with employee ID in on the ON line: Since there are only a finite amount of departments.  
+---departments should be viewed as the highest in the hierchy to determine number of managers.  Think about the relationship 
+
+
+SELECT dept.department_name, dept.manager_id, emp.first_name, emp.last_name
+FROM departments dept
+JOIN
+employees emp
+ON (dept.manager_id=emp.employee_id)
+
+SELECT *
+FROM departments
+
+SELECT *
+FROM employees 
+
+-------------------Q5
+---Tricky because you need to set the set value of dept.location_id=1700, it's a condition
+
+Select emp.first_name, emp.last_name
+FROM employees emp
+JOIN
+departments dept
+ON (emp.department_id=dept.department_id) 
+JOIN
+locations loc
+ON (loc.location_id=dept.location_id)
+AND 
+dept.location_id=1700
+
+
+-----
+SELECT *
+FROM employees 
+
+Select *
+FROM locations
+
+Select *
+from departments
