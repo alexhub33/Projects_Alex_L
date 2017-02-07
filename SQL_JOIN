@@ -1,5 +1,13 @@
-Alex Leung
-JOIN SQL practice
+
+# Script Name   : SQL_JOIN.py
+# Author        : Alex L
+# Created       :  January 2016
+# Last Modified :  February 2017
+# Version       : 1.0.0
+# Modifications : Added exceptions
+#
+# Description   : SQL JOIN PRACTICE
+
 
 ------Q1
 SELECT emp.first_name+emp.last_name AS 'Employee',
