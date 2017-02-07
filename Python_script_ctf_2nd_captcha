@@ -1,5 +1,13 @@
-#Alex L
-#This code is used to open a page and parse through the code to find the key in the inspect elements
+
+# Script Name   : Python_script_ctf_2nd_captcha.py
+# Author        : Alex L
+# Created       : December 2016
+# Last Modified : January 2017
+# Version       : 2.0.0
+# Modifications : Added additional functions
+#               : 
+## Description : This code is used to open a page and parse through the code to find the key in the inspect elements
+
 #Note to inspect the code, there's the use of arrays and the 1st element
 #The script will loop until "KEY" is found, site requested....1000+ captchas.
 #To do this we manipulated the URL, created a loop with the array, 
