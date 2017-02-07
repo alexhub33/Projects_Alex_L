@@ -54,9 +54,9 @@ FROM locations
 
 
 ---------Q4
-----Tricky because it want's just the manager's first name and last names.  Not all the employees
----explain why you matched manager ID with employee ID in on the ON line: Since there are only a finite amount of departments.  
----departments should be viewed as the highest in the hierchy to determine number of managers.  Think about the relationship 
+----Tricky because it wants just the manager's first name and last names.  Not all the employees
+- -Explain why you matched manager ID with employee ID in on the ON line: Since there are only a finite amount of departments.  
+---Departments should be viewed as the highest in the hierchy to determine number of managers.  Think about the relationship 
 
 
 SELECT dept.department_name, dept.manager_id, emp.first_name, emp.last_name
