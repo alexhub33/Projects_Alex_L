@@ -1,6 +1,11 @@
-#Alex L
-#This code will open a web page until it finds a KEY.  Key can be found in the inspect elements, hidden from plainview.
-
+# Script Name   : Bash_Database_Add_Edit_Get_Remove.py
+# Author        : Alex L
+# Created       : December 2016
+# Last Modified : February 2017
+# Version       : 2.0.0
+# Modifications : Added additional functions
+#
+# Description   : This code will open a web page until it finds a KEY.  Key can be found in the inspect elements, hidden from plainview.
 
 #c92Cnb9_RSc
 #pre-provided functions
