@@ -1,0 +1,168 @@
+
+# Script Name   : SQL_A_AVG_
+# Author        : Alex L
+# Created       :  February 2017
+# Last Modified :  February 2017
+# Version       : 1.0.0
+# Modifications : Checked
+#
+# Description : SQL AVG, GROUP, JOIN, ISNULL
+
+
+-- Q1.
+--Display the complete details of supervisors who have salary less than the average salary of all
+supervisors.
+
+SELECT * 
+FROM staff
+WHERE st_position = 'Supervisor'
+AND st_salary < (SELECT AVG(st_salary) FROM staff WHERE st_position = 'Supervisor')
+
+
+--Q2.
+--List the total number of rental listing, the result should be grouped based on the city and the type of
+--property. Column headings for the result set should be:
+
+SELECT rp_city AS "city", 
+	   rp_type AS "Property Type",
+	   COUNT(*) AS "Number of Available Properties " 
+FROM rentproperty
+GROUP BY rp_city, rp_type
+
+--Q3.
+--List the customer last name and first name, the complete address of the property they have requested
+--for viewing in the first six months of 2006.
+--The CONVERT() function is a general function that converts an expression of one data type to another.
+
+--The CONVERT() function can be used to display date/time data in different formats.
+--CONVERT(data_type(length),expression,style)
+--102	2 = yy.mm.dd
+--102 = yyyy.mm.dd	ANSI
+
+--DATETIME - format: YYYY-MM-DD HH:MI:SS
+
+SELECT cl_firstname, 
+	   cl_lastname, 
+	   viewing.vw_viewdate, 
+	   rentproperty.rp_street, 
+	   rentproperty.rp_state, 
+	   rentproperty.rp_city, 
+	   rentproperty.rp_zipcode
+FROM client, viewing, rentproperty
+WHERE client.cl_clientno = viewing.vw_cl_clientno
+AND viewing.vw_rp_propertyno = rentproperty.rp_propertyno
+AND viewing.vw_viewdate  >= CONVERT(DATETIME, '2006-01-01', 102) 
+AND viewing.vw_viewdate  <= CONVERT(DATETIME, '2006-06-30', 102);
+
+
+--4.
+--List the complete address for properties who have been rented within the first month of their listed
+--date.
+--The DATEDIFF() function returns the time between two dates.
+--DATEDIFF(datepart,startdate,enddate)
+
+
+ 	 SELECT rentproperty.rp_propertyno, 
+	   rentproperty.rp_street, 
+	   rentproperty.rp_state, 
+	   rentproperty.rp_city, 
+	   rentproperty.rp_zipcode	   
+FROM rentproperty, rental
+WHERE rentproperty.rp_propertyno = rental.ren_rp_propertyno
+AND DATEDIFF(day,rental.ren_moveindate, rentproperty.rp_datelisted) <= 30
+
+
+--5.
+--List of staff (the name and number) and the total number of properties listed by them. Result should
+--display the staff member with maximum properties at the top. Columns heading should be as under:
+
+
+SELECT staff.st_staffno  AS "STAFF NUMBER", 
+       staff.st_name AS "STAFF Name", 
+	   COUNT(*) AS "Number of Properties Listed"
+FROM staff, rentproperty
+WHERE staff.st_staffno = rentproperty.rp_st_staffno
+GROUP BY staff.st_staffno, staff.st_name
+ORDER BY COUNT(*) DESC
+
+
+--Q6.
+--List the branch number, branch name and total number of supervisors working in that branch. Restrict
+--the result set to branches where number of supervisors are more than one.
+
+SELECT branch.br_branchno, 
+	   branch.br_branchname, 
+	   COUNT(*) AS "Number of Supervisors" 
+FROM branch, staff
+WHERE staff.st_br_branchno = branch.br_branchno
+AND staff.st_position = 'Supervisor'
+GROUP BY branch.br_branchno, branch.br_branchname
+HAVING COUNT(*) > 1
+
+--Q7.
+--# note CAST used to convert data from one type to another,  
+--# round function: SELECT ROUND(column_name,decimals) FROM table_name;
+--# In SQL Server, the ISNULL( ) function is used to replace NULL value with another value.
+--#example: SELECT SUM (ISNULL(Sales,100)) FROM Sales_Data;
+--http://stackoverflow.com/questions/1056323/difference-between-numeric-float-and-decimal-in-sql-server
+--http://stackoverflow.com/questions/2377174/how-do-i-interpret-precision-and-scale-of-a-number-in-a-database
+
+SELECT staff.st_staffno AS "Staff Number", 
+	   staff.st_name AS "Staff Name",
+	   staff.st_position AS "Job Title",
+	   COUNT(*) AS "Number of propoerties rented", 
+	   CAST(ROUND(AVG(staff.st_salary) * (AVG(ISNULL(staff.st_commperc, 0))	/ 100), 2) AS NUMERIC(36,2)) AS "Commission"
+FROM rental, staff
+WHERE staff.st_staffno = rental.ren_st_staffno
+GROUP BY staff.st_staffno, staff.st_name, staff.st_position
+
+
+
+SELECT staff.st_staffno AS "Staff Number", 
+	   staff.st_name AS "Staff Name",
+	   staff.st_position AS "Job Title",
+	   COUNT(*) AS "Number of propoerties rented", 
+	   CAST(ROUND(AVG(staff.st_salary) * (AVG(COALESCE(staff.st_commperc, 0))	/ 100), 2) AS NUMERIC(36,2)) AS "Commission"
+FROM rental, staff
+WHERE staff.st_staffno = rental.ren_st_staffno
+GROUP BY staff.st_staffno, staff.st_name, staff.st_position
+
+
+
+--Q8.
+SELECT rentproperty.rp_type,
+	   owner.ow_firstname, 
+	   owner.ow_lastname, 
+	   owner.ow_address,
+	   rentproperty.rp_rent
+FROM rentproperty, owner
+WHERE rentproperty.rp_ow_ownerno = owner.ow_ownerno
+AND rentproperty.rp_rooms > 6
+ORDER BY rentproperty.rp_type, rentproperty.rp_rent DESC
+
+
+--Q9.
+SELECT owner.ow_firstname + ' ' +  owner.ow_lastname AS "Owner", 
+	   rentproperty.rp_street + ',' + rentproperty.rp_city + ',' +  rentproperty.rp_state+ ',' + rentproperty.rp_zipcode AS "Property Address",
+	   client.cl_firstname + ',' +  client.cl_lastname AS "Renter", 
+	   rental.ren_rate AS "Monthly Lease"
+FROM rentproperty, owner, rental, client
+WHERE owner.ow_ownerno = rentproperty.rp_ow_ownerno
+AND rentproperty.rp_propertyno = rental.ren_rp_propertyno
+AND rental.ren_cl_clientno = client.cl_clientno
+
+
+--Q10.
+--List the name for manager in each branch who were hired between 2001 and 2005.
+--Group the results to branches in each city. Below is a snap shot for the result set.
+
+--CONVERT(DATETIME, '2001-01-01', 102) 
+
+SELECT branch.br_city AS "Branch City", 
+	   branch.br_branchname AS "Branch Name", 
+	   staff.st_name AS "Manager"
+FROM branch, staff
+WHERE staff.st_br_branchno = branch.br_branchno
+AND staff.st_position = 'Manager'
+AND staff.st_hiredate  >= CONVERT(DATETIME, '2001-01-01', 102) 
+AND staff.st_hiredate  <= CONVERT(DATETIME, '2005-12-31', 102) 
